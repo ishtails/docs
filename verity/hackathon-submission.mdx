@@ -1,0 +1,59 @@
+---
+title: "Hackathon submission"
+description: "Submission-ready content template for Verity"
+---
+
+## Project name
+
+Verity - Proof-of-Value Infrastructure for Consultations
+
+## One-liner
+
+Verity enables outcome-based consultation payments using escrow, autonomous evidence capture, and AI-powered merit settlement.
+
+## Problem
+
+Consultation markets depend on blind trust, creating payment risk for experts and quality risk for learners.
+
+## What we built
+
+- Escrow-first session lifecycle
+- Weighted goal pact before sessions
+- Autonomous witness recording integration
+- AI judging and transparent payout computation
+- Claim/dispute settlement screens
+- End-to-end demo flow at `/demo/*`
+
+## Architecture snapshot
+
+- Frontend: React + TanStack Router
+- API: Hono service layer
+- Contracts: session registry + manager
+- Integrations: Recall.ai, Chainlink Functions, IPFS
+
+## Innovation
+
+- Converts subjective conversation quality into structured settlement signals
+- Aligns incentives for experts and learners via deterministic payout logic
+- Improves trust with objective evidence and final settlement path
+
+## Demo story
+
+1. Login and onboarding
+2. Host creates and shares a session
+3. Learner joins and funds escrow
+4. Session runs and enters evaluation
+5. Results show payout/refund and claim options
+
+## Impact
+
+- Higher trust in consultation markets
+- Lower dispute overhead
+- Better performer discovery through merit signals
+
+## Next milestones
+
+- Finalize payout verification implementation
+- Complete dashboard APIs
+- Harden chainlink-driven settlement path
+- Add reputation analytics and session history depth

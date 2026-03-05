@@ -1,0 +1,45 @@
+---
+title: "API and contracts"
+description: "Key contract actions and backend domains"
+---
+
+## Contract actions
+
+- `requestSessionRegistration()`
+- `fundSessionEscrow()`
+- `requestEvaluation()`
+- `claimTeacher()`
+- `claimLearner()`
+- `dispute()`
+
+## API domains
+
+- `sessions`
+- `meetings`
+- `goals`
+- `users`
+- `ai`
+
+## Typical request sequence
+
+1. Create session metadata and goals.
+2. Register session on-chain.
+3. Fund learner escrow.
+4. Complete session and request evaluation.
+5. Deliver AI report/oracle result.
+6. Enable claims and dispute window.
+
+## Evaluation payload (conceptual)
+
+```json
+{
+  "sessionId": "sess_erc20_001",
+  "overallScore": 85,
+  "confidence": 85,
+  "learning": 85,
+  "teacherPayout": 42.25,
+  "learnerRefund": 7.75,
+  "disputeDeadline": "<timestamp>",
+  "evidenceRef": "ipfs://..."
+}
+```

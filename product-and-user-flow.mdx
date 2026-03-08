@@ -1,13 +1,13 @@
 ---
 title: "Product and User Flow"
-description: "How to use Verity as a Teacher or Learner, and the complete session lifecycle."
+description: "How to use Verity as a Host or Attendee, and the complete session lifecycle."
 ---
 
-Verity orchestrates a trustless exchange of knowledge between Teachers and Learners.
+Verity orchestrates a trustless exchange of knowledge between Hosts and Attendees.
 
 ---
 
-## The Teacher Journey
+## The Host Journey
 
 ### 1. Setup & Discovery
 
@@ -17,7 +17,7 @@ Verity orchestrates a trustless exchange of knowledge between Teachers and Learn
 
 ### 2. Session Execution
 
-- **Wait for Learner**: Once a learner funds the escrow, you'll be notified.
+- **Wait for Attendee**: Once an attendee funds the escrow, you'll be notified.
 - **Start Meeting**: The Verity bot (Recall.ai) automatically joins to record the session.
 - **Teach**: Deliver your session as planned.
 
@@ -29,12 +29,12 @@ Verity orchestrates a trustless exchange of knowledge between Teachers and Learn
 
 ---
 
-## The Learner Journey
+## The Attendee Journey
 
 ### 1. Discovery & Booking
 
-- **Find a Teacher**: Browse available sessions and review teacher ratings and goals.
-- **Join Session**: Enter the session code provided by your teacher.
+- **Find a Host**: Browse available sessions and review host ratings and goals.
+- **Join Session**: Enter the session code provided by your host.
 
 ### 2. Payment & Access
 
@@ -52,82 +52,44 @@ Verity orchestrates a trustless exchange of knowledge between Teachers and Learn
 
 The end-to-end flow from listing creation to fund distribution:
 
-```
-┌─────────────┐     1. Create Listing      ┌─────────────┐
-│   Teacher   │────────────────────────────►│  Web UI     │
-│   (Host)    │                             │  /dashboard │
-└─────────────┘                             └──────┬──────┘
-                                                   │
-                                                   │ 2. POST /sessions
-                                                   ▼
-                                           ┌─────────────┐
-                                           │   Server    │
-                                           │  (Hono API) │
-                                           └──────┬──────┘
-                                                  │
-                                                  │ 3. Store metadata
-                                                  ▼
-                                           ┌─────────────┐
-                                           │  Database   │
-                                           └─────────────┘
+```mermaid
+flowchart TB
+    subgraph setup [Setup]
+        S1[1. Host creates listing]
+        S2[2. POST /sessions]
+        S3[3. Store metadata in DB]
+        S1 --> S2 --> S3
+    end
 
-┌─────────────┐     4. Book Session        ┌─────────────┐
-│   Learner   │────────────────────────────►│  Web UI     │
-│  (Attendee) │                             │  /listings  │
-└─────────────┘                             └──────┬──────┘
-                                                   │
-                                                   │ 5. POST /meetings
-                                                   ▼
-                                           ┌─────────────┐
-                                           │   Server    │
-                                           │  (Calendar) │
-                                           └──────┬──────┘
-                                                  │
-                                                  │ 6. Google Calendar API
-                                                  │    Creates Meet URL
-                                                  ▼
-                                           ┌─────────────┐
-                                           │  Meeting    │
-                                           │   URL       │
-                                           └──────┬──────┘
-                                                  │
-                                                  │ 7. Return { meetingUrl }
-                                                  ▼
-┌─────────────┐     8. Join Meeting        ┌─────────────┐
-│   Teacher   │◄────────────────────────────│  Learner    │
-│   Learner   │    (Google Meet)            │  pays USDC  │
-└─────────────┘                             └─────────────┘
-       │
-       │ 9. Meeting happens
-       │    Recall bot joins
-       ▼
-[CRE workflows take over — see Contracts and CRE]
-       │
-       ▼
-┌─────────────┐
-│   CRE       │ 10. Initiation Workflow
-│  Workflow   │     (creates bot, stores data)
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│   CRE       │ 11. Settlement Workflow  
-│  Workflow   │     (AI eval via Gemini,
-│             │      calculates payout)
-└──────┬──────┘
-       │
-       ▼
-[Contracts settle payment]
-       │
-       ▼
-┌─────────────┐     12. Claim funds        ┌─────────────┐
-│   Teacher   │◄───────────────────────────│   Learner   │
-│   claims    │    (via Web UI)            │   claims    │
-└─────────────┘                             └─────────────┘
+    subgraph booking [Booking]
+        B1[4. Attendee books session]
+        B2[5. POST /meetings]
+        B3[6. Google Calendar creates Meet URL]
+        B4[7. Return meetingUrl]
+        B1 --> B2 --> B3 --> B4
+    end
+
+    subgraph meeting [Meeting]
+        M1[8. Host and Attendee join Meet]
+        M2[9. Recall bot records session]
+        M1 --> M2
+    end
+
+    subgraph cre [CRE Workflows]
+        C1[10. Initiation Workflow\ncreates bot, stores data]
+        C2[11. Settlement Workflow\nAI eval via Gemini, calculates payout]
+        C1 --> C2
+    end
+
+    subgraph claims [Settlement]
+        CL[12. Host and Attendee claim funds via Web UI]
+    end
+
+    setup --> booking --> meeting --> cre --> claims
 ```
 
 **Steps 1-9:** Web layer (UI, server, database) — see [Server and Client](/server-and-client).
 
 **Steps 10-11:** Chainlink CRE workflows run autonomously — no server involvement. See [Contracts and CRE](/contracts-and-cre).
 
-**Step 12:** Both parties claim funds via the Web UI after the on-chain settlement completes.
+**Step 12:** Host and attendee claim funds via the Web UI after the on-chain settlement completes.

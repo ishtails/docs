@@ -11,11 +11,11 @@ Verity uses **Chainlink CRE** to autonomously evaluate teaching sessions and set
 
 **The Flow:**
 
-1. Learner books session → USDC locked in escrow
+1. Attendee books session → USDC locked in escrow
 2. CRE workflow creates Recall bot → records meeting → generates transcript
-3. Teacher requests evaluation → CRE workflow calls Gemini AI
+3. Host requests evaluation → CRE workflow calls Gemini AI
 4. AI scores session (0-10000 basepoints) → workflow settles payment on-chain
-5. Teachers and learners claim funds based on merit
+5. Hosts and attendees claim funds based on merit
 
 **Key Innovation:** AI evaluation happens via Chainlink DON, not a centralized server — making it trustless and verifiable.
 
@@ -227,8 +227,8 @@ function reduceEvaluationToScore(evaluation, session) {
 
 | Function                                                | Purpose                          |
 | ------------------------------------------------------- | -------------------------------- |
-| `createListing(dataCID, price)`                         | Teacher creates listing          |
-| `requestSessionRegistration(listingIndex, meetingLink)` | Learner books, pays USDC         |
+| `createListing(dataCID, price)`                         | Host creates listing             |
+| `requestSessionRegistration(listingIndex, meetingLink)` | Attendee books, pays USDC       |
 | `_processReport(bytes)`                                 | CRE callback — registers session |
 
 
@@ -246,7 +246,7 @@ event SessionRegistrationRequested(
 
 **Flow:**
 
-1. Learner calls `requestSessionRegistration` → pays USDC to escrow
+1. Attendee calls `requestSessionRegistration` → pays USDC to escrow
 2. Emits `SessionRegistrationRequested` → triggers Initiation Workflow
 3. Workflow calls back `_processReport` → registers in `KXSessionRegistry`
 
@@ -271,10 +271,10 @@ enum Status {
 
 | Function                       | Purpose                        |
 | ------------------------------ | ------------------------------ |
-| `requestEvaluation(sessionId)` | Teacher triggers AI evaluation |
+| `requestEvaluation(sessionId)` | Host triggers AI evaluation    |
 | `_processReport(bytes)`        | CRE callback with scores       |
-| `claimTeacher(sessionId)`      | Teacher claims earned portion  |
-| `claimLearner(sessionId)`      | Learner claims refund          |
+| `claimTeacher(sessionId)`      | Host claims earned portion     |
+| `claimLearner(sessionId)`      | Attendee claims refund         |
 
 
 **Settlement Math (Quadratic Scoring):**
@@ -285,7 +285,7 @@ uint256 teacherShareBps = (uint256(effective) * uint256(effective)) / 10000;
 uint256 teacherAmount = (session.amount * teacherShareBps) / 10000;
 ```
 
-Teachers earn more for high-confidence, high-learning scores.
+Hosts earn more for high-confidence, high-learning scores.
 
 ---
 

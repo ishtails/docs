@@ -14,11 +14,11 @@ Verity uses **Chainlink CRE** to autonomously evaluate teaching sessions and set
 
 **The Flow:**
 
-1. Learner books session → USDC locked in escrow
+1. Attendee books session → USDC locked in escrow
 2. CRE workflow creates Recall bot → records meeting → generates transcript
-3. Teacher requests evaluation → CRE workflow calls Gemini AI
+3. Host requests evaluation → CRE workflow calls Gemini AI
 4. AI scores session (0-10000 basepoints) → workflow settles payment on-chain
-5. Teachers and learners claim funds based on merit
+5. Hosts and attendees claim funds based on merit
 
 **Key Innovation:** AI evaluation happens via Chainlink DON, not a centralized server — making it trustless and verifiable.
 
@@ -39,28 +39,76 @@ Verity uses **Chainlink CRE** to autonomously evaluate teaching sessions and set
 
 ---
 
+## Architecture Overview
+
+```mermaid
+flowchart TD
+    A[Host creates listing] -->|On-chain| B[KXManager.sol]
+    C[Attendee requests session] -->|On-chain| B
+    B -->|Emits SessionRegistrationRequested| D[Initiation Workflow]
+    D -->|Registers session| E[KXSessionRegistry.sol]
+    F[Session occurs off-chain] -->|Transcript uploaded| G[Settlement Workflow]
+    G -->|HTTP Request| H[AI Service]
+    H -->|Returns scores + confidence| G
+    G -->|Signed report| E
+    E -->|Updates session status| I[Session settled]
+    G -->|HTTP Write| J[IPFS]
+    I -->|Claim payouts| K[Host/Attendee claims]
+```
+
+---
+
 ## Workflow Architecture
 
+```mermaid
+flowchart TB
+    subgraph cre [Chainlink CRE Network]
+        InitWF[Initiation Workflow\nverity-initiation]
+        SettleWF[Settlement Workflow\nverity-settlement]
+    end
+
+    subgraph evm [EVM Sepolia]
+        KXManager[KXManager\nListings · Initiation]
+        KXRegistry[KXSessionRegistry\nEscrow · AI Evaluation]
+    end
+
+    KXManager -->|"EVM Log Trigger"| InitWF
+    KXRegistry -->|"EVM Log Trigger"| SettleWF
+    InitWF --> KXRegistry
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     CHAINLINK CRE NETWORK                        │
-│  ┌─────────────────────┐        ┌─────────────────────────────┐  │
-│  │  Initiation WF      │        │  Settlement WF              │  │
-│  │  (verity-initiation)│        │  (verity-settlement)          │  │
-│  └─────────────────────┘        └─────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-           ▲                                  ▲
-           │                                  │
-    EVM Log Trigger                   EVM Log Trigger
-           │                                  │
-┌──────────┴──────────────────────────────────┴──────────────────┐
-│                        EVM (Sepolia)                           │
-│  ┌──────────────────┐                 ┌──────────────────────┐  │
-│  │  KXManager       │                 │  KXSessionRegistry     │  │
-│  │  - Listings      │                 │  - Escrow              │  │
-│  │  - Initiation    │                 │  - AI Evaluation       │  │
-│  └──────────────────┘                 └──────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
+
+---
+
+## Flow of Operations
+
+```mermaid
+sequenceDiagram
+    participant Host
+    participant Attendee
+    participant KXManager as KXManager Contract
+    participant Registry as KXSessionRegistry Contract
+    participant InitWF as Initiation Workflow
+    participant SettleWF as Settlement Workflow
+    participant AI as AI Service
+    participant IPFS as IPFS Store
+
+    Host->>KXManager: Create listing (topic, price, dataCID)
+    Attendee->>KXManager: Request session for listing (meeting link)
+    KXManager->>KXManager: Transfer USDC to Registry escrow
+    KXManager->>InitWF: Emit SessionRegistrationRequested event
+    InitWF->>InitWF: Detect event and register session
+    InitWF->>Registry: Register session on-chain
+    Note over Attendee,Host: Session occurs off-chain (e.g., video call)
+    Host->>SettleWF: Request evaluation (transcript dataCID)
+    SettleWF->>AI: POST transcript for evaluation
+    AI->>SettleWF: Return learningBps, confidenceBps, evidenceCID
+    SettleWF->>SettleWF: Validate and encode report
+    SettleWF->>SettleWF: Sign with ECDSA/keccak256
+    SettleWF->>Registry: Submit onReport transaction
+    Registry->>Registry: Decode and settle session
+    SettleWF->>IPFS: Write settlement data
+    Host->>Registry: Claim host payout
+    Attendee->>Registry: Claim attendee refund (if applicable)
 ```
 
 ---
@@ -208,8 +256,8 @@ function reduceEvaluationToScore(evaluation, session) {
 
 | Function                                                | Purpose                          |
 | ------------------------------------------------------- | -------------------------------- |
-| `createListing(dataCID, price)`                         | Teacher creates listing          |
-| `requestSessionRegistration(listingIndex, meetingLink)` | Learner books, pays USDC         |
+| `createListing(dataCID, price)`                         | Host creates listing             |
+| `requestSessionRegistration(listingIndex, meetingLink)` | Attendee books, pays USDC       |
 | `_processReport(bytes)`                                 | CRE callback — registers session |
 
 **Key Events:**
@@ -226,7 +274,7 @@ event SessionRegistrationRequested(
 
 **Flow:**
 
-1. Learner calls `requestSessionRegistration` → pays USDC to escrow
+1. Attendee calls `requestSessionRegistration` → pays USDC to escrow
 2. Emits `SessionRegistrationRequested` → triggers Initiation Workflow
 3. Workflow calls back `_processReport` → registers in `KXSessionRegistry`
 
@@ -250,10 +298,10 @@ enum Status {
 
 | Function                       | Purpose                        |
 | ------------------------------ | ------------------------------ |
-| `requestEvaluation(sessionId)` | Teacher triggers AI evaluation |
+| `requestEvaluation(sessionId)` | Host triggers AI evaluation    |
 | `_processReport(bytes)`        | CRE callback with scores       |
-| `claimTeacher(sessionId)`      | Teacher claims earned portion  |
-| `claimLearner(sessionId)`      | Learner claims refund          |
+| `claimTeacher(sessionId)`      | Host claims earned portion     |
+| `claimLearner(sessionId)`      | Attendee claims refund         |
 
 ### Settlement Math (Quadratic Scoring)
 
@@ -263,7 +311,7 @@ uint256 teacherShareBps = (uint256(effective) * uint256(effective)) / 10000;
 uint256 teacherAmount = (session.amount * teacherShareBps) / 10000;
 ```
 
-Teachers earn more for high-confidence, high-learning scores.
+Hosts earn more for high-confidence, high-learning scores.
 
 ---
 
@@ -358,3 +406,5 @@ test:
     - chain-name: ethereum-testnet-sepolia
       url: https://0xrpc.io/sep
 ```
+
+For full setup, environment variables, and Abi Ninja testing, see [Testing CRE Workflows](/cre-testing).

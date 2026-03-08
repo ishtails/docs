@@ -17,7 +17,7 @@ This doc explains the **web layer** — the UI and server that facilitate the CR
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                                   USER LAYER                                     │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────────────────┐  │
-│  │   Teacher    │  │   Learner    │  │           Verity Web UI              │  │
+│  │    Host      │  │  Attendee    │  │           Verity Web UI              │  │
 │  │  (Host)      │  │  (Attendee)  │  │      (React + TanStack Router)       │  │
 │  └──────────────┘  └──────────────┘  └──────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────────┘
@@ -112,7 +112,7 @@ This doc explains the **web layer** — the UI and server that facilitate the CR
 
 | Route                | Purpose              | Key Function                      |
 | -------------------- | -------------------- | --------------------------------- |
-| `/sessions`          | Session/listing CRUD | Teacher creates listings          |
+| `/sessions`          | Session/listing CRUD | Host creates listings              |
 | `/sessions/meetings` | Meeting scheduling   | Server generates Google Meet URLs |
 | `/users`             | User profiles        | Auth + profile management         |
 
@@ -127,7 +127,7 @@ This doc explains the **web layer** — the UI and server that facilitate the CR
 
 **Handler:** `packages/web/api/handlers/meetings.ts`
 
-When a learner books a session:
+When an attendee books a session:
 
 ```typescript
 // Server calls Google Calendar API
@@ -182,7 +182,7 @@ return { meetingUrl, sessionPrice };
 
 ```
 ┌─────────────┐     1. Create Listing      ┌─────────────┐
-│   Teacher   │────────────────────────────►│  Web UI     │
+│    Host     │────────────────────────────►│  Web UI     │
 │   (Host)    │                             │  /dashboard │
 └─────────────┘                             └──────┬──────┘
                                                    │
@@ -200,7 +200,7 @@ return { meetingUrl, sessionPrice };
                                            └─────────────┘
 
 ┌─────────────┐     4. Book Session        ┌─────────────┐
-│   Learner   │────────────────────────────►│  Web UI     │
+│  Attendee   │────────────────────────────►│  Web UI     │
 │  (Attendee) │                             │  /listings  │
 └─────────────┘                             └──────┬──────┘
                                                    │
@@ -222,8 +222,8 @@ return { meetingUrl, sessionPrice };
                                                   │ 7. Return { meetingUrl }
                                                   ▼
 ┌─────────────┐     8. Join Meeting        ┌─────────────┐
-│   Teacher   │◄────────────────────────────│  Learner    │
-│   Learner   │    (Google Meet)            │  pays USDC  │
+│    Host     │◄────────────────────────────│  Attendee   │
+│  Attendee   │    (Google Meet)            │  pays USDC  │
 └─────────────┘                             └─────────────┘
        │
        │ 9. Meeting happens
@@ -249,7 +249,7 @@ return { meetingUrl, sessionPrice };
        │
        ▼
 ┌─────────────┐     12. Claim funds        ┌─────────────┐
-│   Teacher   │◄───────────────────────────│   Learner   │
+│    Host     │◄───────────────────────────│  Attendee   │
 │   claims    │    (via Web UI)            │   claims    │
 └─────────────┘                             └─────────────┘
 ```

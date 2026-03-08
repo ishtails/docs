@@ -35,7 +35,7 @@
           },
           {
             "group": "Reference",
-            "pages": ["quickstart", "deployment", "api-reference/introduction"]
+            "pages": ["quickstart", "cre-testing", "deployment", "api-reference/introduction"]
           }
         ]
       }

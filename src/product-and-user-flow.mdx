@@ -1,0 +1,133 @@
+---
+title: "Product and User Flow"
+description: "How to use Verity as a Teacher or Learner, and the complete session lifecycle."
+---
+
+Verity orchestrates a trustless exchange of knowledge between Teachers and Learners.
+
+---
+
+## The Teacher Journey
+
+### 1. Setup & Discovery
+
+- **Connect Wallet**: Access your dashboard by connecting your EVM wallet.
+- **Create Session**: Define your offering with a topic, duration, and price in USDC.
+- **Define Goals**: Establish **weighted learning goals** (e.g., "Deploy ERC-20 contract" - Weight 5/5).
+
+### 2. Session Execution
+
+- **Wait for Learner**: Once a learner funds the escrow, you'll be notified.
+- **Start Meeting**: The Verity bot (Recall.ai) automatically joins to record the session.
+- **Teach**: Deliver your session as planned.
+
+### 3. Evaluation & Settlement
+
+- **Request Evaluation**: Click "Request Evaluation" after the meeting ends.
+- **Receive Results**: AI processes the transcript (2-5 min) and calculates your merit score.
+- **Claim Funds**: Earnings are available to claim immediately to your wallet.
+
+---
+
+## The Learner Journey
+
+### 1. Discovery & Booking
+
+- **Find a Teacher**: Browse available sessions and review teacher ratings and goals.
+- **Join Session**: Enter the session code provided by your teacher.
+
+### 2. Payment & Access
+
+- **Fund Escrow**: Approve and lock the USDC amount in the smart contract.
+- **Join Meeting**: Access the meeting link provided in the dashboard.
+
+### 3. Results & Refund
+
+- **AI Evaluation**: Wait 2-5 minutes for the AI to analyze the transcript.
+- **Claim Refund**: If the session goals weren't fully met, your refund portion is available to claim immediately.
+
+---
+
+## Complete Session Flow
+
+The end-to-end flow from listing creation to fund distribution:
+
+```
+┌─────────────┐     1. Create Listing      ┌─────────────┐
+│   Teacher   │────────────────────────────►│  Web UI     │
+│   (Host)    │                             │  /dashboard │
+└─────────────┘                             └──────┬──────┘
+                                                   │
+                                                   │ 2. POST /sessions
+                                                   ▼
+                                           ┌─────────────┐
+                                           │   Server    │
+                                           │  (Hono API) │
+                                           └──────┬──────┘
+                                                  │
+                                                  │ 3. Store metadata
+                                                  ▼
+                                           ┌─────────────┐
+                                           │  Database   │
+                                           └─────────────┘
+
+┌─────────────┐     4. Book Session        ┌─────────────┐
+│   Learner   │────────────────────────────►│  Web UI     │
+│  (Attendee) │                             │  /listings  │
+└─────────────┘                             └──────┬──────┘
+                                                   │
+                                                   │ 5. POST /meetings
+                                                   ▼
+                                           ┌─────────────┐
+                                           │   Server    │
+                                           │  (Calendar) │
+                                           └──────┬──────┘
+                                                  │
+                                                  │ 6. Google Calendar API
+                                                  │    Creates Meet URL
+                                                  ▼
+                                           ┌─────────────┐
+                                           │  Meeting    │
+                                           │   URL       │
+                                           └──────┬──────┘
+                                                  │
+                                                  │ 7. Return { meetingUrl }
+                                                  ▼
+┌─────────────┐     8. Join Meeting        ┌─────────────┐
+│   Teacher   │◄────────────────────────────│  Learner    │
+│   Learner   │    (Google Meet)            │  pays USDC  │
+└─────────────┘                             └─────────────┘
+       │
+       │ 9. Meeting happens
+       │    Recall bot joins
+       ▼
+[CRE workflows take over — see Contracts and CRE]
+       │
+       ▼
+┌─────────────┐
+│   CRE       │ 10. Initiation Workflow
+│  Workflow   │     (creates bot, stores data)
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│   CRE       │ 11. Settlement Workflow  
+│  Workflow   │     (AI eval via Gemini,
+│             │      calculates payout)
+└──────┬──────┘
+       │
+       ▼
+[Contracts settle payment]
+       │
+       ▼
+┌─────────────┐     12. Claim funds        ┌─────────────┐
+│   Teacher   │◄───────────────────────────│   Learner   │
+│   claims    │    (via Web UI)            │   claims    │
+└─────────────┘                             └─────────────┘
+```
+
+**Steps 1-9:** Web layer (UI, server, database) — see [Server and Client](/server-and-client).
+
+**Steps 10-11:** Chainlink CRE workflows run autonomously — no server involvement. See [Contracts and CRE](/contracts-and-cre).
+
+**Step 12:** Both parties claim funds via the Web UI after the on-chain settlement completes.

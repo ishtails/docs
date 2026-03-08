@@ -1,5 +1,5 @@
 ---
-title: "Introduction"
+title: "Overview"
 description: "Verity is the Proof-of-Value infrastructure for the global consultation market."
 mode: "wide"
 ---
@@ -19,7 +19,7 @@ mode: "wide"
 
 Verity replaces blind trust with **Verifiable Outcomes**. It ensures experts are paid for their impact and learners only pay for what they actually gain.
 
-## 🎯 Core Value Proposition
+## Core Value Proposition
 
 Verity eliminates the "Trust Gap" using three pillars:
 
@@ -27,27 +27,49 @@ Verity eliminates the "Trust Gap" using three pillars:
 - **Autonomous Witness**: AI observer (Recall.ai) captures objective session data.
 - **Merit-Based Settlement**: Proprietary judging agent (Gemini AI) audits against goals with automatic on-chain settlement.
 
-## ✅ Implemented Features
+## How It Works
 
-### Core Protocol Features
+Verity uses **Chainlink CRE** to autonomously evaluate teaching sessions and settle payments based on AI-verified quality metrics.
 
-#### 1. Smart Escrow System
+**The Flow:**
+
+1. Learner books session → USDC locked in escrow
+2. CRE workflow creates Recall bot → records meeting → generates transcript
+3. Teacher requests evaluation → CRE workflow calls Gemini AI
+4. AI scores session (0-10000 basepoints) → workflow settles payment on-chain
+5. Teachers and learners claim funds based on merit
+
+**Key Innovation:** AI evaluation happens via Chainlink DON, not a centralized server — making it trustless and verifiable.
+
+**Value Proposition:**
+
+- **Trustless:** AI evaluation via Chainlink DON, verifiable by anyone
+- **Fair:** Quadratic scoring rewards high-quality teaching
+- **Autonomous:** No human in the loop — session completes → AI evaluates → payment flows
+
+## Core Protocol Features
+
+### Smart Escrow System
+
 - **Secure Fund Locking**: USDC funds locked in escrow before sessions begin.
 - **No Payment Risk**: Teachers get guaranteed payment, learners get guaranteed refunds.
 - **Instant Settlement**: Funds automatically distributed after evaluation.
 
-#### 2. AI-Powered Session Evaluation
+### AI-Powered Session Evaluation
+
 - **Autonomous Witness**: Recall.ai bots automatically join and record sessions.
 - **Multi-Criteria Assessment**: Evaluates topic relevance, depth, engagement, substance, time usage, and clarity.
 - **Weighted Goals**: Custom success criteria with importance weighting.
 - **Confidence Scoring**: AI provides confidence levels for evaluation reliability.
 
-#### 3. Merit-Based Payment System
+### Merit-Based Payment System
+
 - **Quadratic Payout Formula**: `((confidence + learning)/2)^2` determines payment percentage.
 - **Transparent Scoring**: Detailed breakdown of how scores translate to payouts.
 - **Instant Finality**: No chargebacks or payment disputes.
 
-#### 4. Session Management
+### Session Management
+
 - **Cross-Platform Support**: Zoom, Google Meet, and Microsoft Teams integration.
 - **State Tracking**: Complete session lifecycle from creation to settlement.
 - **Real-time Status**: Live updates on session progress and recording status.

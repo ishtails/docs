@@ -15,28 +15,27 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Technical",
-        "groups": [
-          {
-            "group": "Core Infrastructure",
-            "pages": ["technical-architecture", "web-architecture"]
-          },
-          {
-            "group": "API Reference",
-            "pages": ["api-reference/introduction"]
-          }
-        ]
-      },
-      {
-        "tab": "Product",
+        "tab": "Documentation",
         "groups": [
           {
             "group": "Overview",
-            "pages": ["index", "introduction"]
+            "pages": ["src/index", "src/overview"]
           },
           {
-            "group": "Guides",
-            "pages": ["user-guides", "quickstart", "development"]
+            "group": "Contracts and CRE",
+            "pages": ["src/contracts-and-cre"]
+          },
+          {
+            "group": "Server and Client",
+            "pages": ["src/server-and-client"]
+          },
+          {
+            "group": "Product and User Flow",
+            "pages": ["src/product-and-user-flow"]
+          },
+          {
+            "group": "Reference",
+            "pages": ["src/quickstart", "src/deployment", "src/api-reference/introduction"]
           }
         ]
       }

@@ -1,33 +1,34 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: "API Reference"
+description: "Integrating with the Verity Web API."
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
-
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+The Verity Web API provides endpoints for managing listings, sessions, and user profiles.
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API requests must include a Privy authentication token in the `Authorization` header:
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```bash
+Authorization: Bearer <privy_token>
 ```
+
+## Base URL
+
+```text
+https://api.verity.heatiroi.xyz
+```
+
+## Core Endpoints
+
+### Sessions
+- `GET /sessions`: List all available session listings.
+- `POST /sessions`: Create a new listing (Teacher).
+- `GET /sessions/:id`: Get detailed information about a specific session.
+
+### Meetings
+- `POST /meetings`: Generate a Google Meet URL for a booked session.
+
+### Users
+- `GET /users/me`: Get current user profile and wallet info.
+- `PATCH /users/me`: Update profile details.

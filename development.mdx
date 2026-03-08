@@ -1,37 +1,36 @@
 ---
-title: "Documentation workflow"
-description: "How to maintain Verity docs"
+title: "Development"
+description: "How to maintain and update the Verity documentation."
 ---
 
-## Source of truth
+## Documentation Structure
 
-Primary product source files:
-- `docs/verity-spec.md`
-- `docs/documentation/*`
-- `packages/web/src/app/demo/*`
+Verity's documentation is consolidated into four primary logical chunks:
 
-## Updating docs
+- **`introduction.mdx`**: Core value proposition and features.
+- **`user-guides.mdx`**: Teacher and Learner end-to-end journeys.
+- **`architecture.mdx`**: Technical stack, CRE workflows, and smart contracts.
+- **`api-reference/`**: Web API endpoints and integration details.
 
-1. Update product/spec details in `docs/verity-spec.md`.
-2. Sync concise docs in `docs/documentation`.
-3. Mirror publish-ready content into Mintlify pages under `packages/docs/verity`.
-4. Update navigation in `packages/docs/docs.json` if pages change.
+## Local Preview
 
-## Local preview
+To preview your changes locally, use the Mintlify CLI:
 
 ```bash
-cd packages/docs
 mint dev
 ```
 
-## Quality checks
+## Quality Checks
+
+Before pushing changes, check for broken links:
 
 ```bash
 mint broken-links
 ```
 
-## Writing style
+## Writing Principles
 
-- Keep pages short and practical.
-- Prefer diagrams for flow and architecture.
-- Keep examples aligned with current demo routes.
+- **Concise**: One idea per sentence.
+- **Visual**: Use Mermaid diagrams for flows and architecture.
+- **Active Voice**: Speak directly to the user ("you").
+- **Consistent**: Use **Bold** for UI elements and `Code` for file paths and commands.

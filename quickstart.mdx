@@ -1,38 +1,34 @@
 ---
 title: "Quickstart"
-description: "Run and review the Verity demo flow"
+description: "Start the Verity development environment and explore the demo."
 ---
 
-## 1. Start the web app
+## 1. Start the Web App
+
+Verity's web layer is built with Bun and Hono.
 
 ```bash
 cd packages/web
+bun install
 bun run dev
 ```
 
-## 2. Open the end-to-end demo
+## 2. Explore the Demo Flow
 
-Visit these routes in order:
+The demo provides a UI-only walkthrough of the Verity experience. Visit these routes in order to see the full lifecycle:
 
-1. `/demo`
-2. `/demo/login`
-3. `/demo/onboarding`
-4. `/demo/host/dashboard`
-5. `/demo/host/create/details`
-6. `/demo/host/create/goals`
-7. `/demo/host/create/share`
-8. `/demo/learner/join`
-9. `/demo/learner/dashboard`
-10. `/demo/session/live`
-11. `/demo/session/evaluating`
-12. `/demo/session/results`
+1. **Onboarding**: `/demo/onboarding`
+2. **Teacher Dashboard**: `/demo/host/dashboard`
+3. **Create Session**: `/demo/host/create/details` → `/demo/host/create/goals`
+4. **Learner Join**: `/demo/learner/join`
+5. **Session Lifecycle**: `/demo/session/live` → `/demo/session/evaluating` → `/demo/session/results`
 
-## 3. Use the docs set
+## 3. Review the Docs
 
-- Product docs: `/verity/overview`
-- Architecture: `/verity/architecture`
-- Hackathon brief base: `/verity/hackathon-submission`
+- **Product Overview**: [Introduction](/introduction)
+- **Technical Architecture**: [Architecture](/architecture)
+- **User Journeys**: [User Guides](/user-guides)
 
 <Note>
-  The demo flow is UI-only mock data for product iteration. Settlement and API behavior are represented visually.
+  The demo flow currently uses mock data for product iteration. Real settlement and AI evaluation are handled by the [CRE Workflows](/architecture#2-cre-workflows-oracles).
 </Note>

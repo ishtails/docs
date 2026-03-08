@@ -250,6 +250,19 @@ function reduceEvaluationToScore(evaluation, session) {
 
 ## Smart Contracts
 
+### Contract Relationship
+
+```mermaid
+flowchart LR
+    KXManager[KXManager] -->|sessionRegistry| KXRegistry[KXSessionRegistry]
+    KXManager -->|usdc| USDC[USDC Token]
+    KXRegistry -->|holds escrow| USDC
+    KXManager -->|emits event| InitWF[Initiation WF]
+    InitWF -->|registers| KXRegistry
+    KXRegistry -->|emits event| SettleWF[Settlement WF]
+    SettleWF -->|onReport| KXRegistry
+```
+
 ### `KXManager.sol` — Listings & Initiation
 
 **Key Functions:**
@@ -284,6 +297,17 @@ event SessionRegistrationRequested(
 
 **Session States:**
 
+```mermaid
+stateDiagram-v2
+    [*] --> None
+    None --> Funded: Attendee pays USDC
+    Funded --> Evaluated: CRE returns AI scores
+    Evaluated --> Finalized: Dispute window passes
+    Evaluated --> Disputed: Participant disputes
+    Disputed --> Evaluated: Dispute resolved
+    Finalized --> [*]: Claim complete
+```
+
 ```solidity
 enum Status {
   None,      // 0
@@ -304,6 +328,23 @@ enum Status {
 | `claimLearner(sessionId)`      | Attendee claims refund         |
 
 ### Settlement Math (Quadratic Scoring)
+
+```mermaid
+flowchart LR
+    subgraph inputs [Inputs]
+        Conf[confidenceBps]
+        Learn[learningBps]
+    end
+    subgraph calc [Calculation]
+        Eff[effective = avg]
+        Sq[teacherShareBps = effective²]
+        Amt[teacherAmount = amount × share]
+    end
+    Conf --> Eff
+    Learn --> Eff
+    Eff --> Sq
+    Sq --> Amt
+```
 
 ```solidity
 uint16 effective = (confidenceBps + learningBps) / 2;
@@ -350,6 +391,22 @@ zAiEvaluationResponse = {
 ---
 
 ## External API Integrations
+
+```mermaid
+flowchart TB
+    subgraph init [Initiation Workflow]
+        InitWF[Initiation WF]
+    end
+    subgraph settle [Settlement Workflow]
+        SettleWF[Settlement WF]
+    end
+
+    InitWF -->|POST /bot| Recall1[Recall.ai]
+    InitWF -->|Write| Pinata1[Pinata IPFS]
+    SettleWF -->|GET /transcript| Recall2[Recall.ai]
+    SettleWF -->|POST chat completions| Gemini[Gemini AI]
+    SettleWF -->|Write| Pinata2[Pinata IPFS]
+```
 
 | Service   | Endpoint                               | Auth                    | Called By           |
 | --------- | -------------------------------------- | ----------------------- | ------------------- |

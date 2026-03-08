@@ -59,26 +59,21 @@ Verity uses **Chainlink CRE** to autonomously evaluate teaching sessions and set
 
 ## Workflow Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     CHAINLINK CRE NETWORK                        │
-│  ┌─────────────────────┐        ┌─────────────────────────────┐  │
-│  │  Initiation WF      │        │  Settlement WF              │  │
-│  │  (verity-initiation)│        │  (verity-settlement)          │  │
-│  └─────────────────────┘        └─────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-           ▲                                  ▲
-           │                                  │
-    EVM Log Trigger                   EVM Log Trigger
-           │                                  │
-┌──────────┴──────────────────────────────────┴──────────────────┐
-│                        EVM (Sepolia)                           │
-│  ┌──────────────────┐                 ┌──────────────────────┐  │
-│  │  KXManager       │                 │  KXSessionRegistry     │  │
-│  │  - Listings      │                 │  - Escrow              │  │
-│  │  - Initiation    │                 │  - AI Evaluation       │  │
-│  └──────────────────┘                 └──────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph cre [Chainlink CRE Network]
+        InitWF[Initiation Workflow\nverity-initiation]
+        SettleWF[Settlement Workflow\nverity-settlement]
+    end
+
+    subgraph evm [EVM Sepolia]
+        KXManager[KXManager\nListings · Initiation]
+        KXRegistry[KXSessionRegistry\nEscrow · AI Evaluation]
+    end
+
+    KXManager -->|"EVM Log Trigger"| InitWF
+    KXRegistry -->|"EVM Log Trigger"| SettleWF
+    InitWF --> KXRegistry
 ```
 
 ---

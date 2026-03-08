@@ -5,6 +5,18 @@ description: "Run and test the Chainlink CRE workflows locally or against pre-de
 
 This guide helps you test the Verity CRE workflows — the initiation and settlement workflows that power AI evaluation and on-chain settlement.
 
+```mermaid
+flowchart LR
+    subgraph options [Testing Options]
+        A[Option 1\nSimulate workflows] 
+        B[Option 2\nAbi Ninja]
+    end
+    A -->|cre workflow simulate| Contracts[Pre-deployed Sepolia]
+    B -->|No deploy| Contracts
+    Contracts --> InitWF[Initiation WF]
+    Contracts --> SettleWF[Settlement WF]
+```
+
 ---
 
 ## Prerequisites

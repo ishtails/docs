@@ -13,59 +13,41 @@ This doc explains the **web layer** — the UI and server that facilitate the CR
 
 ## System Overview
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                                   USER LAYER                                     │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────────────────┐  │
-│  │    Host      │  │  Attendee    │  │           Verity Web UI              │  │
-│  │  (Host)      │  │  (Attendee)  │  │      (React + TanStack Router)       │  │
-│  └──────────────┘  └──────────────┘  └──────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────────┘
-                                          │
-                                          ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              WEB PACKAGE (Bun/Hono)                              │
-│  ┌────────────────────────────────────────────────────────────────────────────┐ │
-│  │                           API Server                                        │ │
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                          │ │
-│  │  │ /sessions   │ │  /meetings  │ │   /users    │                          │ │
-│  │  │ CRUD        │ │  Calendar   │ │  Profile    │                          │ │
-│  │  └─────────────┘ └─────────────┘ └─────────────┘                          │ │
-│  └────────────────────────────────────────────────────────────────────────────┘ │
-│  ┌────────────────────────────────────────────────────────────────────────────┐ │
-│  │                         Database (Drizzle ORM)                              │ │
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                          │ │
-│  │  │   users     │ │  sessions   │ │  meetings   │                          │ │
-│  │  └─────────────┘ └─────────────┘ └─────────────┘                          │ │
-│  └────────────────────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────────────────┘
-                                          │
-         ┌────────────────────────────────┼────────────────────────────────┐
-         ▼                                ▼                                ▼
-┌────────────────────┐      ┌────────────────────────┐      ┌────────────────────┐
-│  Google Calendar   │      │      Recall.ai        │      │      Pinata        │
-│  (Meeting URLs)    │      │  (Recording/Transcript)│      │   (IPFS Storage)   │
-└────────────────────┘      └────────────────────────┘      └────────────────────┘
-                                          │
-                                          ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                        BLOCKCHAIN & CRE ORACLE LAYER                             │
-│  ┌────────────────────────────┐        ┌──────────────────────────────────────┐│
-│  │      EVM (Sepolia)         │        │     Chainlink CRE Network            ││
-│  │  ┌──────────────────────┐   │        │  ┌────────────────────────────────┐   ││
-│  │  │    KXManager         │   │        │  │   Initiation Workflow          │   ││
-│  │  │   - Listings         │   │◄───────┼──┤   (See docs/cre.md)            │   ││
-│  │  │   - Session Requests │   │        │  └────────────────────────────────┘   ││
-│  │  └──────────────────────┘   │        │  ┌────────────────────────────────┐   ││
-│  │         │                    │        │  │   Settlement Workflow          │   ││
-│  │         ▼                    │        │  │   (See docs/cre.md)            │   ││
-│  │  ┌──────────────────────┐   │        │  └────────────────────────────────┘   ││
-│  │  │ KXSessionRegistry    │   │        │                                      ││
-│  │  │   - Escrow           │   │        │                                      ││
-│  │  │   - AI Evaluation    │   │        │                                      ││
-│  │  └──────────────────────┘   │        │                                      ││
-│  └────────────────────────────┘        │                                      ││
-└─────────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph user [User Layer]
+        Host[Host]
+        Attendee[Attendee]
+        WebUI[Verity Web UI\nReact + TanStack Router]
+    end
+
+    subgraph web [Web Package Bun/Hono]
+        API[API Server\n/sessions · /meetings · /users]
+        DB[(Database\nusers · sessions · meetings)]
+        API --> DB
+    end
+
+    subgraph external [External Services]
+        Calendar[Google Calendar]
+        Recall[Recall.ai]
+        Pinata[Pinata IPFS]
+    end
+
+    subgraph chain [Blockchain and CRE]
+        KXManager[KXManager]
+        KXRegistry[KXSessionRegistry]
+        InitWF[Initiation Workflow]
+        SettleWF[Settlement Workflow]
+    end
+
+    Host --> WebUI
+    Attendee --> WebUI
+    WebUI --> API
+    API --> Calendar
+    KXManager --> InitWF
+    KXRegistry --> SettleWF
+    Recall --> chain
+    Pinata --> chain
 ```
 
 **Key Point:** The web layer handles UI and meeting logistics. All AI evaluation and settlement logic lives in CRE workflows (see `docs/cre.md`).
@@ -180,78 +162,40 @@ return { meetingUrl, sessionPrice };
 
 ## Complete Session Flow
 
-```
-┌─────────────┐     1. Create Listing      ┌─────────────┐
-│    Host     │────────────────────────────►│  Web UI     │
-│   (Host)    │                             │  /dashboard │
-└─────────────┘                             └──────┬──────┘
-                                                   │
-                                                   │ 2. POST /sessions
-                                                   ▼
-                                           ┌─────────────┐
-                                           │   Server    │
-                                           │  (Hono API) │
-                                           └──────┬──────┘
-                                                  │
-                                                  │ 3. Store metadata
-                                                  ▼
-                                           ┌─────────────┐
-                                           │  Database   │
-                                           └─────────────┘
+```mermaid
+flowchart TB
+    subgraph setup [Setup]
+        S1[1. Host creates listing]
+        S2[2. POST /sessions]
+        S3[3. Store metadata in DB]
+        S1 --> S2 --> S3
+    end
 
-┌─────────────┐     4. Book Session        ┌─────────────┐
-│  Attendee   │────────────────────────────►│  Web UI     │
-│  (Attendee) │                             │  /listings  │
-└─────────────┘                             └──────┬──────┘
-                                                   │
-                                                   │ 5. POST /meetings
-                                                   ▼
-                                           ┌─────────────┐
-                                           │   Server    │
-                                           │  (Calendar) │
-                                           └──────┬──────┘
-                                                  │
-                                                  │ 6. Google Calendar API
-                                                  │    Creates Meet URL
-                                                  ▼
-                                           ┌─────────────┐
-                                           │  Meeting    │
-                                           │   URL       │
-                                           └──────┬──────┘
-                                                  │
-                                                  │ 7. Return { meetingUrl }
-                                                  ▼
-┌─────────────┐     8. Join Meeting        ┌─────────────┐
-│    Host     │◄────────────────────────────│  Attendee   │
-│  Attendee   │    (Google Meet)            │  pays USDC  │
-└─────────────┘                             └─────────────┘
-       │
-       │ 9. Meeting happens
-       │    Recall bot joins
-       ▼
-[From here, CRE workflows take over — see docs/cre.md]
-       │
-       ▼
-┌─────────────┐
-│   CRE       │ 10. Initiation Workflow
-│  Workflow   │     (creates bot, stores data)
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│   CRE       │ 11. Settlement Workflow  
-│  Workflow   │     (AI eval via Gemini,
-│             │      calculates payout)
-└──────┬──────┘
-       │
-       ▼
-[Contracts settle payment — see docs/cre.md]
-       │
-       ▼
-┌─────────────┐     12. Claim funds        ┌─────────────┐
-│    Host     │◄───────────────────────────│  Attendee   │
-│   claims    │    (via Web UI)            │   claims    │
-└─────────────┘                             └─────────────┘
+    subgraph booking [Booking]
+        B1[4. Attendee books session]
+        B2[5. POST /meetings]
+        B3[6. Google Calendar creates Meet URL]
+        B4[7. Return meetingUrl]
+        B1 --> B2 --> B3 --> B4
+    end
+
+    subgraph meeting [Meeting]
+        M1[8. Host and Attendee join Meet]
+        M2[9. Recall bot records session]
+        M1 --> M2
+    end
+
+    subgraph cre [CRE Workflows]
+        C1[10. Initiation Workflow\ncreates bot, stores data]
+        C2[11. Settlement Workflow\nAI eval via Gemini, calculates payout]
+        C1 --> C2
+    end
+
+    subgraph claims [Settlement]
+        CL[12. Host and Attendee claim funds via Web UI]
+    end
+
+    setup --> booking --> meeting --> cre --> claims
 ```
 
 **Steps 10-11:** Happen autonomously via Chainlink CRE — no server involvement.

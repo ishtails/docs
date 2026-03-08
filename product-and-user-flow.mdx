@@ -5,6 +5,24 @@ description: "How to use Verity as a Host or Attendee, and the complete session 
 
 Verity orchestrates a trustless exchange of knowledge between Hosts and Attendees.
 
+```mermaid
+flowchart LR
+    subgraph host [Host Journey]
+        H1[Create listing] --> H2[Wait for attendee]
+        H2 --> H3[Teach session]
+        H3 --> H4[Request eval]
+        H4 --> H5[Claim payout]
+    end
+    subgraph attendee [Attendee Journey]
+        A1[Find host] --> A2[Fund escrow]
+        A2 --> A3[Join meeting]
+        A3 --> A4[Wait for eval]
+        A4 --> A5[Claim refund]
+    end
+    H2 -.->|session booked| A2
+    H3 -.->|same meeting| A3
+```
+
 ---
 
 ## The Host Journey

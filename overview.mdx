@@ -23,21 +23,26 @@ Verity replaces blind trust with **Verifiable Outcomes**. It ensures experts are
 
 Verity eliminates the "Trust Gap" using three pillars:
 
-- **Smart Escrow**: Funds locked securely before sessions begin.
-- **Autonomous Witness**: AI observer (Recall.ai) captures objective session data.
-- **Merit-Based Settlement**: Proprietary judging agent (Gemini AI) audits against goals with automatic on-chain settlement.
+```mermaid
+flowchart LR
+    Escrow[Smart Escrow] --> Outcome[Verifiable Outcomes]
+    Witness[Autonomous Witness] --> Outcome
+    Settlement[Merit-Based Settlement] --> Outcome
+```
 
 ## How It Works
 
 Verity uses **Chainlink CRE** to autonomously evaluate teaching sessions and settle payments based on AI-verified quality metrics.
 
-**The Flow:**
-
-1. Attendee books session → USDC locked in escrow
-2. CRE workflow creates Recall bot → records meeting → generates transcript
-3. Host requests evaluation → CRE workflow calls Gemini AI
-4. AI scores session (0-10000 basepoints) → workflow settles payment on-chain
-5. Hosts and attendees claim funds based on merit
+```mermaid
+flowchart LR
+    A[1. Attendee books] --> B[2. USDC in escrow]
+    B --> C[3. Recall bot records]
+    C --> D[4. Host requests eval]
+    D --> E[5. AI scores transcript]
+    E --> F[6. On-chain settlement]
+    F --> G[7. Host and Attendee claim]
+```
 
 **Key Innovation:** AI evaluation happens via Chainlink DON, not a centralized server — making it trustless and verifiable.
 
@@ -48,6 +53,17 @@ Verity uses **Chainlink CRE** to autonomously evaluate teaching sessions and set
 - **Autonomous:** No human in the loop — session completes → AI evaluates → payment flows
 
 ## Key Terms
+
+```mermaid
+flowchart LR
+    Host[Host] -->|creates| Listing[Listing]
+    Attendee[Attendee] -->|books| Listing
+    Listing --> Session[Session]
+    Session -->|triggers| InitWF[Initiation WF]
+    Session -->|host requests| SettleWF[Settlement WF]
+    InitWF -->|registers| Session
+    SettleWF -->|payout| Session
+```
 
 - **Listing** — A host's offer: topic, price in USDC, and metadata (stored as `dataCID` on IPFS).
 - **Session** — A booked instance of a listing between a host and attendee. Funds are held in escrow until evaluation.

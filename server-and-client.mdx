@@ -70,6 +70,15 @@ flowchart TB
 
 **Auth Flow:**
 
+```mermaid
+flowchart LR
+    A[Get Started] --> B[Privy modal]
+    B --> C[Embedded wallet]
+    C --> D{New user?}
+    D -->|Yes| E[/onboarding]
+    D -->|No| F[/dashboard]
+```
+
 1. User clicks "Get Started"
 2. Privy modal handles login
 3. Embedded wallet created
@@ -142,6 +151,37 @@ return { meetingUrl, sessionPrice };
 ## Database Schema
 
 **Location:** `packages/web/api/lib/db/schema/`
+
+```mermaid
+erDiagram
+    users ||--o{ sessions : hosts
+    users {
+        string id PK
+        string email
+        string walletAddress
+    }
+    sessions ||--o{ meetings : has
+    sessions ||--o{ goals : has
+    sessions {
+        string id PK
+        string hostId FK
+        string topic
+        string price
+        string dataCID
+    }
+    meetings {
+        string id PK
+        string sessionId FK
+        string meetingUrl
+        string eventId
+    }
+    goals {
+        string id PK
+        string sessionId FK
+        string name
+        number weight
+    }
+```
 
 | Table      | Purpose             | Key Columns                                 |
 | ---------- | ------------------- | ------------------------------------------- |
@@ -259,6 +299,24 @@ Full deployment details in [Contracts and CRE](/contracts-and-cre).
 ## Key Design Decisions
 
 ### Why Separate Web Layer from CRE Workflows?
+
+```mermaid
+flowchart TB
+    subgraph web [Web Layer]
+        UI[UI support]
+        Logistics[Meeting logistics]
+        Cache[On-chain data cache]
+    end
+    subgraph cre [CRE Workflows]
+        AI[AI evaluation]
+        Settlement[Settlement]
+        Oracle[Oracle verification]
+    end
+    web -->|facilitates| Exchange[Knowledge exchange]
+    cre -->|guarantees| Fair[Fair settlement]
+    Exchange --> Trust[User trust]
+    Fair --> Trust
+```
 
 | Layer             | Responsibility                                 | Trust Model                 |
 | ----------------- | ---------------------------------------------- | --------------------------- |

@@ -19,23 +19,23 @@
         "groups": [
           {
             "group": "Overview",
-            "pages": ["src/index", "src/overview"]
+            "pages": ["index", "overview"]
           },
           {
             "group": "Contracts and CRE",
-            "pages": ["src/contracts-and-cre"]
+            "pages": ["contracts-and-cre"]
           },
           {
             "group": "Server and Client",
-            "pages": ["src/server-and-client"]
+            "pages": ["server-and-client"]
           },
           {
             "group": "Product and User Flow",
-            "pages": ["src/product-and-user-flow"]
+            "pages": ["product-and-user-flow"]
           },
           {
             "group": "Reference",
-            "pages": ["src/quickstart", "src/deployment", "src/api-reference/introduction"]
+            "pages": ["quickstart", "deployment", "api-reference/introduction"]
           }
         ]
       }

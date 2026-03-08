@@ -15,28 +15,28 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Product",
-        "groups": [
-          {
-            "group": "Getting Started",
-            "pages": ["index", "introduction", "quickstart", "development"]
-          },
-          {
-            "group": "Using Verity",
-            "pages": ["user-guides"]
-          }
-        ]
-      },
-      {
         "tab": "Technical",
         "groups": [
           {
-            "group": "Architecture",
-            "pages": ["architecture"]
+            "group": "Core Infrastructure",
+            "pages": ["technical-architecture", "web-architecture"]
           },
           {
             "group": "API Reference",
             "pages": ["api-reference/introduction"]
+          }
+        ]
+      },
+      {
+        "tab": "Product",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["index", "introduction"]
+          },
+          {
+            "group": "Guides",
+            "pages": ["user-guides", "quickstart", "development"]
           }
         ]
       }

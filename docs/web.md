@@ -314,8 +314,9 @@ packages/contracts/            # See docs/cre.md
 
 ### Sepolia Testnet
 
-- **KXManager:** `0x6ee50eeafa56f269a8875bb09e2a3ab9608bdf4b`
-- **KXSessionRegistry:** `0x42c105b36825778ca323bf850df6e007b0407dca`
+- **USDC:** `0xb243a36d2cb3937b40043050bf4f7d36795322db`
+- **KXManager:** `0x42c105b36825778ca323bf850df6e007b0407dca`
+- **KXSessionRegistry:** `0xB9f475C996A61c8BC9b2E72B7Df3de3017Dd3C76`
 
 **Full deployment details in `docs/cre.md`**
 

@@ -7,103 +7,39 @@
     "light": "#6366F1",
     "dark": "#4338CA"
   },
-  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/assets/logo.svg",
+    "dark": "/assets/logo.svg"
+  },
+  "favicon": "/assets/logo.svg",
   "navigation": {
     "tabs": [
       {
         "tab": "Product",
         "groups": [
           {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
+            "group": "Getting Started",
+            "pages": ["index", "introduction", "quickstart", "development"]
           },
           {
-            "group": "Verity",
-            "pages": [
-              "verity/overview",
-              "verity/features",
-              "verity/architecture",
-              "verity/user-flows",
-              "verity/api-contracts",
-              "verity/hackathon-submission"
-            ]
+            "group": "Using Verity",
+            "pages": ["user-guides"]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Technical",
         "groups": [
           {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "group": "Architecture",
+            "pages": ["architecture"]
           },
           {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
+            "group": "API Reference",
+            "pages": ["api-reference/introduction"]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Project Spec",
-          "href": "https://github.com",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Verity Domain",
-          "href": "https://verity.heatiroi.xyz",
-          "icon": "globe"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hello@verity.heatiroi.xyz"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Open Demo",
-      "href": "/demo"
-    }
-  },
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
     ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com",
-      "github": "https://github.com",
-      "linkedin": "https://linkedin.com"
-    }
   }
 }
